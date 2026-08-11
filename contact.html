@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Smart Dialog AI</title>
+<meta name="description" content="Talk to Smart Dialog AI about Rango, Cancha, or platform services.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav><div class="wrap nav-inner">
+  <a class="logo" href="index.html">
+    <img src="assets/logo.png" alt="" style="width:34px;height:34px">
+    SMART DIALOG
+  </a>
+  <div class="nav-links">
+    <a href="rango.html">Rango</a>
+    <a href="cancha.html">Cancha</a>
+    <a href="services.html">Services</a>
+    <a href="about.html">About</a>
+  </div>
+  <a class="btn btn-primary" href="contact.html">Talk to us</a>
+</div></nav>
+
+<header class="page-hero"><div class="wrap hero left" style="padding:0">
+  <span class="eyebrow">Contact</span>
+  <h1>Let's start a <em>conversation.</em></h1>
+  <p class="sub">Tell us about your business and what you're trying to solve. We'll get back to you within one business day — in English o en español.</p>
+</div></header>
+
+<section class="wrap split" style="align-items:start">
+  <form class="form" id="contact-form" novalidate>
+    <label for="name">Name</label>
+    <input id="name" name="name" type="text" placeholder="Your name" required>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" placeholder="you@company.com" required>
+    <label for="phone">Phone (optional)</label>
+    <input id="phone" name="phone" type="tel" placeholder="+1 (___) ___-____">
+    <label for="interest">I'm interested in</label>
+    <select id="interest" name="interest">
+      <option>Rango</option>
+      <option>Cancha</option>
+      <option>Platform services</option>
+      <option>Something else</option>
+    </select>
+    <label for="message">Message</label>
+    <textarea id="message" name="message" rows="5" placeholder="Tell us about your business and what you need…"></textarea>
+    <!-- Honeypot: bots fill this, humans never see it -->
+    <input type="text" name="company_website" id="company_website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+    <button class="btn btn-primary btn-lg" type="submit" id="contact-submit">Send message</button>
+    <p id="form-status" role="status" style="margin-top:16px;font-size:15px;font-weight:600;display:none"></p>
+  </form>
+  <div>
+    <div class="card" style="margin-bottom:20px">
+      <p class="tag">Quickest option</p>
+      <h3>Book a demo</h3>
+      <p>See Rango run a playbook for your industry, live. Mention your trade in the message and we'll come prepared.</p>
+    </div>
+    <div class="card">
+      <p class="tag">Direct</p>
+      <h3>Reach us</h3>
+      <p>Email: <a href="mailto:contact@smartdialog-ai.com" style="color:var(--orange-dark);font-weight:600;text-decoration:none">contact@smartdialog-ai.com</a><br>Hours: Mon–Fri, 9 AM–6 PM<br>Rango answers after hours 😉</p>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap foot-grid">
+  <span>© 2026 Smart Dialog AI · A product development company</span>
+  <div class="foot-links">
+    <a href="rango.html">Rango</a>
+    <a href="cancha.html">Cancha</a>
+    <a href="services.html">Services</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</div></footer>
+
+<script>
+// ── Configuration ─────────────────────────────────────────────────────────
+// Your Supabase Edge Function endpoint, e.g.:
+// https://YOUR-PROJECT-REF.supabase.co/functions/v1/contact-form
+const CONTACT_ENDPOINT = "https://dtqodkgiviiljryngowc.supabase.co/functions/v1/contact-form";
+// Supabase anon (public) key — required unless the function is deployed
+// with --no-verify-jwt. Safe to expose in front-end code.
+const SUPABASE_ANON_KEY = "";
+// ──────────────────────────────────────────────────────────────────────────
+
+const form = document.getElementById("contact-form");
+const statusEl = document.getElementById("form-status");
+const submitBtn = document.getElementById("contact-submit");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  // Honeypot: silently drop bot submissions
+  if (form.company_website.value) return;
+
+  if (!form.reportValidity()) return;
+
+  const payload = {
+    name: form.name.value.trim(),
+    email: form.email.value.trim(),
+    phone: form.phone.value.trim(),
+    interest: form.interest.value,
+    message: form.message.value.trim(),
+    source: "smartdialog-ai.com/contact"
+  };
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Sending…";
+  statusEl.style.display = "none";
+
+  try {
+    const headers = { "Content-Type": "application/json" };
+    if (SUPABASE_ANON_KEY) headers["Authorization"] = "Bearer " + SUPABASE_ANON_KEY;
+
+    const res = await fetch(CONTACT_ENDPOINT, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error("Request failed: " + res.status);
+
+    form.reset();
+    statusEl.textContent = "✓ Message sent! Check your inbox — a confirmation is on its way.";
+    statusEl.style.color = "var(--orange-dark)";
+  } catch (err) {
+    statusEl.textContent = "Something went wrong sending your message. Please try again, or email us directly at contact@smartdialog-ai.com.";
+    statusEl.style.color = "#C0392B";
+  } finally {
+    statusEl.style.display = "block";
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Send message";
+  }
+});
+</script>
+
+</body>
+</html>

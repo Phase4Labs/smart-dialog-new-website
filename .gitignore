@@ -1,0 +1,30 @@
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment / secrets — never commit keys
+.env
+.env.*
+*.local
+
+# Supabase CLI local state
+supabase/.temp/
+supabase/.branches/
+supabase/functions/**/.npmrc
+
+# Node (if tooling gets added later)
+node_modules/
+
+# Logs
+*.log
+
+# Local scratch
+*.bak
+*.tmp
